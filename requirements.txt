@@ -1,0 +1,249 @@
+# ============================================================
+#  AI SPATIAL VIDEO ENGINE SERIES — Requirements
+#  v11.0.0  •  Engines I–XI  •  SDK migration to google-genai  •  Aether through Olympus
+# ============================================================
+#
+#  QUICK INSTALL (minimum to run Engines VIII–IX today):
+#
+#    pip install google-genai httpx numpy opencv-python networkx
+#    (IMPORTANT: uninstall google-generativeai first if previously installed)
+#
+#  FULL INSTALL (all engines + optional backends):
+#
+#    pip install -r requirements.txt
+#    # Plus: Blender 4.3+, ffmpeg, and one of ComfyUI / Automatic1111
+#
+# ============================================================
+
+
+# ── Core: Required by ALL engines ────────────────────────────────────────────
+
+google-genai>=1.0.0
+    # NEW SDK — replaces google-generativeai (now deprecated for ER 1.5 use).
+    # Gemini Robotics-ER 1.5 Preview (gemini-robotics-er-1.5-preview):
+    #   • Spatial Kernel — Pointing API [y, x] + box_2d extraction
+    #   • Multimodal handshake — image/video → Structural JSON
+    #   • Oracle Auditor — alignment check (ThinkingPreset.MEDIUM)
+    #   • Causal Chain Audit — multi-hop reasoning (ThinkingPreset.DEEP)
+    #   • Trajectory Generation — native waypoint sequences
+    #   • Consensus Querying — 3-pass averaged coordinates
+    #   • Code Execution Tool — small/occluded object resolution
+    # UPGRADE: pip uninstall google-generativeai && pip install google-genai
+
+httpx>=0.27.0
+    # Async-capable HTTP client used for:
+    #   • Grok Imagine Video API  (xAI)
+    #   • ComfyUI REST API        (localhost:8188)
+    #   • Automatic1111 REST API  (localhost:7860)
+
+numpy>=1.26.0
+    # Used across Engines IV–IX for:
+    #   • Hamiltonian physics integration (IV–V)
+    #   • AABB bounding-box geometry (VI–VII)
+    #   • Voxel grid  (64³ occupancy array, IX)
+    #   • Pinhole Camera Model math (VIII–IX)
+    #   • Multi-frame depth triangulation (IX)
+
+
+# ── Engines VIII–IX: Graph + Vision ──────────────────────────────────────────
+
+opencv-python>=4.8.0
+    # Engine IX (Vertex) — all video processing:
+    #   • VideoFrameExtractor  — cv2.VideoCapture, keyframe + motion extraction
+    #   • PixelAuditor         — cv2.imread, cv2.absdiff, pixel delta measurement
+    #   • Frame-to-PNG saves   — cv2.imwrite
+    # Engine VIII (Archon) — optional: reference frame processing
+    # Also used for: ffmpeg-free video reading, camera calibration helpers
+
+networkx>=3.0
+    # Engine IX (Vertex) — SpatialGraph:
+    #   • MultiDiGraph — nodes = objects, edges = spatial relations
+    #   • Edge properties: distance_m, angle_deg, elevation_deg, temporal_stable
+    #   • Auto-inferred relations: ON_TOP_OF, NEAR, TOUCHING, LEFT_OF, etc.
+    #   • Graph algorithms: weakly_connected_components, BFS traversal
+    #   • Neo4j Cypher export: CREATE/MATCH statements with {distance, angle}
+    # Engine VIII (Archon) — Scene Hypergraph:
+    #   • In-memory graph DB (Neo4j-compatible API)
+    #   • Multi-hop causal chain traversal (Ball → Glass → Cat)
+    #   • Cross-session JSON snapshot persistence
+
+
+# ── Engines VI–IX: Blender (system install) ──────────────────────────────────
+
+# Blender 4.3 or later — REQUIRED for Engines VI, VII, VIII, IX
+#   Download: https://www.blender.org/download/
+#   Must be accessible as `blender` on PATH, or pass full path to engine config.
+#
+#   Why Blender and not bpy pip package?
+#     The standalone `bpy` PyPI package is experimental and lacks Bullet physics,
+#     Mantaflow fluids, Eevee-Next renderer, and the AOV compositor nodes.
+#     Headless CLI mode (`blender --background --python script.py`) is the
+#     recommended approach and is what all engines use internally.
+#
+#   Blender capabilities used:
+#     • Bullet rigid body physics + ptcache.bake_all  (VI–IX)
+#     • Mantaflow fluid simulation                    (VI–VII)
+#     • Eevee-Next renderer + Workbench wireframe     (VI–IX)
+#     • Compositor: Depth AOV, Normal AOV, Beauty     (VI–IX)
+#     • bpy.ops.wm.usd_import — USD asset pipeline   (VIII–IX)
+#     • WORKBENCH/WIREFRAME render for PixelAuditor   (IX)
+#
+# bpy (optional, experimental):
+#   pip install bpy  — limited to geometry scripting, no physics/renderer
+
+
+# ── Engines VI–IX: ffmpeg (system install) ───────────────────────────────────
+
+# ffmpeg — used for final video assembly from rendered frame sequences
+#   Download: https://ffmpeg.org/download.html
+#   Must be accessible as `ffmpeg` on PATH.
+#   Engine IX also reads video natively via cv2 (no ffmpeg needed for input).
+
+
+# ── Neural Skinning Backends (one of the following) ──────────────────────────
+
+# OPTION A — ComfyUI  [RECOMMENDED]
+#   Install: git clone https://github.com/comfyanonymous/ComfyUI
+#            cd ComfyUI && pip install -r requirements.txt
+#            python main.py --listen
+#   API endpoint: http://127.0.0.1:8188  (set comfyui_base_url in config)
+#   Required nodes:    ControlNetLoader, ControlNetApplyAdvanced, KSampler,
+#                      VAEEncode, VAEDecode, CLIPTextEncode, SaveImage
+#   Required models:   depth_anything_v2.safetensors
+#                      control_v11p_sd15_depth.pth (or sd-xl variant)
+#                      control_v11p_sd15_canny.pth
+#                      control_v11p_sd15_normalbae.pth
+#                      your chosen base diffusion model (.safetensors)
+
+# OPTION B — Automatic1111 (sd-webui)
+#   Install: https://github.com/AUTOMATIC1111/stable-diffusion-webui
+#            Launch with: --api flag
+#   API endpoint: http://127.0.0.1:7860  (set a1111_base_url in config)
+#   Required extension: sd-webui-controlnet
+#   Required models:    same as ComfyUI above
+
+# OPTION C — Grok Imagine Video  [FUTURE API]
+#   Set use_grok_video=True and grok_api_key="xai-..." in engine config.
+#   Endpoint: https://api.x.ai/v1  (set grok_base_url in config)
+#   Status: Not yet publicly available as of early 2026.
+#           ComfyUI/SVD fallback is active when unavailable.
+
+
+# ── Graph Database Backends (Engine VIII–IX) ─────────────────────────────────
+
+# OPTION A — In-Memory Graph  [DEFAULT, zero install]
+#   Engine VIII: set use_in_memory_graph=True in ArchonConfig  (default)
+#   Engine IX:   set use_networkx_graph=True in VertexConfig   (default)
+#   All graph operations work identically to the live-server options.
+#   Graph persists to JSON snapshot for cross-session continuity.
+
+# OPTION B — Neo4j Community Server
+#   Install: https://neo4j.com/download/
+#            Or: docker run -p 7474:7474 -p 7687:7687 neo4j
+#   Python driver:
+neo4j>=5.0.0
+    # pip install neo4j
+    # Configure bolt://localhost:7687 in ArchonConfig / VertexConfig
+    # Both engines export full Cypher with CREATE + edge {distance, angle} props
+
+# OPTION C — Memgraph (drop-in Neo4j replacement, faster for analytics)
+#   pip install gqlalchemy  (not listed here — install manually if needed)
+#   https://memgraph.com/download
+
+
+# ── Cross-Modal Encoder (Engine VIII–IX) ─────────────────────────────────────
+
+# OPTION A — Stub vectors  [DEFAULT, zero install]
+#   CrossModalEncoder uses random unit vectors as placeholders.
+#   All API calls work; similarity scores are not meaningful.
+#   Replace CrossModalEncoder._encode_image / _encode_text bodies to upgrade.
+
+# OPTION B — OpenCLIP  [RECOMMENDED for production]
+open-clip-torch>=2.24.0
+    # pip install open-clip-torch
+    # Provides CLIP-style image+text embedding for cross-modal graph search.
+    # Enables: engine.retrieve_asset_by_image("sketch.jpg")
+    # Model auto-downloads on first use (~430 MB, ViT-B/32 default).
+
+# OPTION C — ImageBind (Facebook Research)
+#   Install: https://github.com/facebookresearch/ImageBind
+#   Supports: image, text, audio, depth, thermal, IMU in one embedding space.
+#   Requires CUDA GPU for practical use.
+
+
+# ── Development & Testing ─────────────────────────────────────────────────────
+
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+
+
+# ── Summary: Minimum install per engine tier ─────────────────────────────────
+#
+#  Engines I–V   (Grok-based, text-driven):
+#    pip install google-genai httpx numpy
+#    (IMPORTANT: uninstall google-generativeai first if previously installed)
+#
+#  Engine VI–VII (Blender + Neural Skin):
+#    pip install google-genai httpx numpy
+#    + Blender 4.3+  (system)
+#    + ffmpeg         (system)
+#    + ComfyUI        (local server)
+#
+#  Engine VIII  (Archon — Persistent Graph):
+#    pip install google-genai httpx numpy
+#    pip install opencv-python networkx          ← adds cv2 + NetworkX
+#    + Blender 4.3+  (system)
+#    + ComfyUI        (local server)
+#    Optional: neo4j, open-clip-torch
+#
+#  Engine IX  (Vertex — Video → Graph → Pixel Audit):
+#    pip install google-genai httpx numpy opencv-python networkx
+#    (IMPORTANT: uninstall google-generativeai first if previously installed)
+#    + Blender 4.3+  (system)
+#    + ComfyUI        (local server)
+#    Optional: neo4j, open-clip-torch
+#
+#  Engine X  (Apex — Full ER 1.5 SDK Showcase):
+#    pip install google-genai httpx numpy opencv-python networkx
+#    (IMPORTANT: uninstall google-generativeai first if previously installed)
+#    All five SDK fixes applied — no extra packages beyond Engine IX
+#
+# ── ONE-LINE INSTALL for Engines VIII–XI ─────────────────────────────────────
+#
+#    pip install google-genai httpx numpy opencv-python networkx
+#    (IMPORTANT: uninstall google-generativeai first if previously installed)
+#
+
+# ── Engine XI (Olympus) — Protocol-specific additions ────────────────────────
+#
+#  Engine XI requires everything from Engine IX PLUS:
+#
+#  Protocol 1 (Depth Triangulation):
+#    opencv-python   — cv2.calcOpticalFlowFarneback for dense optical flow
+#    numpy           — vector math for SfM parallax calculation
+#    Both already in requirements above.
+#
+#  Protocol 2 (Async Cache + Tiered Audit):
+#    No new packages — uses asyncio (stdlib) + existing Gemini client
+#    Flash model (gemini-1.5-flash-latest) via same GeminiERClient
+#
+#  Protocol 3 (UV-Pinned Skinning):
+#    hashlib         — stdlib, for deterministic seed derivation
+#    httpx           — already in requirements, for ControlNet-Tile API
+#    Blender 4.3+    — UV smart_project + image texture node assignment
+#
+# ── ONE-LINE INSTALL for Engine XI (Olympus) ─────────────────────────────────
+#
+#    pip install google-genai httpx numpy opencv-python networkx
+#    (IMPORTANT: uninstall google-generativeai first if previously installed)
+#    Same as Engine IX — all Protocol 1-3 math uses stdlib + cv2 + numpy
+#
+# ── ENGINE XI VERSION NOTES ──────────────────────────────────────────────────
+#
+#  v11.0.0 — Engine XI (Olympus)
+#    + Protocol 1: DepthTriangulator (SfM + Pinhole + Relative Scale fusion)
+#    + Protocol 2: StateChangeCache (velocity extrapolation + static frame skip)
+#    + Protocol 2: TieredAuditor (Flash fast-path + ER 1.5 escalation)
+#    + Protocol 3: UVPinnedSkinning (generate-once + ControlNet-Tile patch)
+#    + OlympusSpatialKernel: augmented prompt with 'relative_scale' field
+#    + Temporal seed derivation: sha256(session:object:keyframe_group) % 2^32

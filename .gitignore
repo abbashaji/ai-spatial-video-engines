@@ -1,0 +1,73 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+
+# ── Environment & secrets ─────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.key
+secrets.json
+
+# ── Virtual environments ──────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Blender ───────────────────────────────────────────────────────────────────
+*.blend1
+*.blend2
+*.blend3
+/renders/
+/output/
+/outputs/
+
+# ── Video & image assets (generated) ─────────────────────────────────────────
+*.mp4
+*.avi
+*.mov
+*.mkv
+rendered_frames/
+frame_dumps/
+
+# ── ComfyUI / Diffusion model weights (large files, not for git) ──────────────
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+ComfyUI/
+models/
+
+# ── Packaging & archives ──────────────────────────────────────────────────────
+*.zip
+*.tar.gz
+*.tar.bz2
+
+# ── IDE & OS ──────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Testing & coverage ────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# ── Graph DB snapshots (local only) ──────────────────────────────────────────
+*.graph.json
+scene_hypergraph_*.json
+spatial_graph_*.json
